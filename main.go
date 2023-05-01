@@ -110,9 +110,12 @@ func set_cgroup_setting(pid int, cpu_quota string, cpu_period string, memory_max
 }
 
 func load_image(filename string) error {
-	fmt.Print(fmt.Sprintf("./image/%s\n", filename))
+	err := os.MkdirAll("image/archive", 755)
+	if err != nil {
+		return (err)
+	}
 	cmd := exec.Command("tar", "-xvf", fmt.Sprintf("./image/%s", filename), "-C", "./image/archive")
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return (err)
 	}
@@ -126,6 +129,10 @@ func load_image(filename string) error {
 		return (err)
 	}
 	top_layer := manifest[0].Layers[0]
+	err = os.MkdirAll("rootfs2", 755)
+	if err != nil {
+		return (err)
+	}
 	cmd = exec.Command("tar", "-xvf", fmt.Sprintf("./image/archive/%s", top_layer), "-C", "rootfs2")
 	err = cmd.Run()
 	if err != nil {
