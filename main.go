@@ -110,7 +110,7 @@ func set_cgroup_setting(pid int, cpu_quota string, cpu_period string, memory_max
 }
 
 func load_image(filename string) error {
-	err := os.MkdirAll("image/archive", 755)
+	err := os.MkdirAll("image/archive", 777)
 	if err != nil {
 		return (err)
 	}
@@ -128,15 +128,25 @@ func load_image(filename string) error {
 	if err != nil {
 		return (err)
 	}
-	top_layer := manifest[0].Layers[0]
-	err = os.MkdirAll("rootfs2", 755)
-	if err != nil {
-		return (err)
+
+	err = os.MkdirAll("rootfs2", 777)
+	for _, layer := range manifest[0].Layers {
+		fmt.Printf("loading:%v\n", layer)
+		cmd = exec.Command("tar", "-xvf", fmt.Sprintf("./image/archive/%s", layer), "-C", "rootfs2")
+		err = cmd.Run()
+		if err != nil {
+			return (err)
+		}
 	}
-	cmd = exec.Command("tar", "-xvf", fmt.Sprintf("./image/archive/%s", top_layer), "-C", "rootfs2")
-	err = cmd.Run()
-	if err != nil {
-		return (err)
-	}
+	// top_layer := manifest[0].Layers[0]
+	// err = os.MkdirAll("rootfs2", 755)
+	// if err != nil {
+	// 	return (err)
+	// }
+	// cmd = exec.Command("tar", "-xvf", fmt.Sprintf("./image/archive/%s", top_layer), "-C", "rootfs2")
+	// err = cmd.Run()
+	// if err != nil {
+	// 	return (err)
+	// }
 	return nil
 }
