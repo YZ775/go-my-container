@@ -1,4 +1,4 @@
 .DS_Store
-rootfs
-rootfs2
-image
+rootfs/*
+rootfs2/*
+image/*
